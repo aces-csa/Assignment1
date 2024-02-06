@@ -28,6 +28,7 @@ public class Driver {
 		while(input!=-1 ){
 
 
+
 			switch (input){
 				case 1 :
 					System.out.println("enter user info");
@@ -61,7 +62,8 @@ public class Driver {
 
 
 			}
-
+			System.out.println("Enter 1 create user , 2 to login , 3 to delete user  and 4 to list all the users");
+             input = sc.nextInt() ;
 
 
 		 
