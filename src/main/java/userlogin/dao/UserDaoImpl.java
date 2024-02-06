@@ -2,7 +2,10 @@ package userlogin.dao;
 
 import userlogin.exceptions.UserNotFoudException;
 import userlogin.model.User;
+import userlogin.util.DatabaseInitializer;
+import userlogin.util.QueryMapper;
 
+import javax.management.Query;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import  java.sql.* ;
@@ -19,12 +22,11 @@ public class UserDaoImpl  implements UserDao{
 	@Override
 	public User getUser(String username, String pass)  {
 		
-		try {  
+		try {
 
-        String  url="jdbc:postgresql://localhost:5432/assignment1";
-            conn = DriverManager.getConnection(url , "postgres" , "postgres");
+            conn= DatabaseInitializer.getconnection() ;
              
-            PreparedStatement statement = conn. prepareStatement("select * from appusers where username = ? and password = ?");
+            PreparedStatement statement = conn. prepareStatement(QueryMapper.query4);
              statement.setString(1 , username);
              statement.setString(2 , pass);
              ResultSet rs = statement.executeQuery() ;
@@ -56,33 +58,45 @@ public class UserDaoImpl  implements UserDao{
 	}
 
 
+    private  boolean getUser(String username){
+        try{
+            conn =  DatabaseInitializer.getconnection() ;
+
+
+
+            PreparedStatement statement = conn. prepareStatement(QueryMapper.query5);
+            statement.setString(1 , username);
+
+            ResultSet rs = statement.executeQuery() ;
+           if( rs.next())
+               return  true ;
+
+
+
+        }
+        catch ( Exception e) {
+            System.out.println(e);
+        }
+
+        return  false ;
+    }
+
     @Override
     public void setUser(User user) {
 
         try {
 
-            String  url="jdbc:postgresql://localhost:5432/assignment1";
-            conn = DriverManager.getConnection(url , "postgres" , "postgres");
+            conn= DatabaseInitializer.getconnection() ;
 
 
 
-            try{
+                   if(getUser(user.getUsername())){
+                       System.out.println("user found with same username !!! \n change the username and try again ");
+                       return   ;
+                   }
 
-                 PreparedStatement pr = conn.prepareStatement("select * from appusers where username = ?");
-                 pr.setString(1 , user.getUsername());
-                 ResultSet rs =  pr.executeQuery() ;
-                 if( rs.next())
-                 {
-                     System.out.println("user with username already exits !!!!!!");
-                     return ;
-                 }
 
-            }
-            catch (Exception e ){
-                System.out.println(e.fillInStackTrace());
-            }
-
-            PreparedStatement statement = conn. prepareStatement("insert into appusers(fullname ,username , dateofbirth,password) values(?,?,?,?)");
+            PreparedStatement statement = conn. prepareStatement(QueryMapper.query2);
             statement.setString(1, user.getFullname());
             statement.setString(2 , user.getUsername());
             statement.setDate(3 , Date.valueOf(user.getDateofBirth()));
@@ -110,10 +124,9 @@ public class UserDaoImpl  implements UserDao{
         List<User> users  = new ArrayList<User>( );
         try {
 
-            String  url="jdbc:postgresql://localhost:5432/assignment1";
-            conn = DriverManager.getConnection(url , "postgres" , "postgres");
+             conn= DatabaseInitializer.getconnection() ;
 
-            PreparedStatement statement = conn. prepareStatement("select * from appusers ;");
+            PreparedStatement statement = conn. prepareStatement(QueryMapper.query3);
 
             ResultSet rs = statement.executeQuery() ;
             while(rs.next()) {
@@ -144,10 +157,9 @@ public class UserDaoImpl  implements UserDao{
 
         try
         {
-            String  url="jdbc:postgresql://localhost:5432/assignment1";
-            conn = DriverManager.getConnection(url , "postgres" , "postgres");
+            conn = DatabaseInitializer.getconnection() ;
 
-            PreparedStatement statement = conn. prepareStatement("select * from appusers where username =? ;");
+            PreparedStatement statement = conn. prepareStatement(QueryMapper.query5);
             statement.setString(1 , username );
             ResultSet rs = statement.executeQuery() ;
 
@@ -155,7 +167,7 @@ public class UserDaoImpl  implements UserDao{
                 throw new UserNotFoudException()  ;
             }
             else{
-                statement = conn.prepareStatement("delete from appusers where username = ? ");
+                statement = conn.prepareStatement(QueryMapper.query6);
                 statement.setString(1, username);
                 int res = statement.executeUpdate() ;
                 if( res >  0 ){
