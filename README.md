@@ -1,4 +1,6 @@
 Programming with Java and JDBC Primary Assessment
+
+
 Evaluation Criteria
 • Does the Java code provide an accurate and complete solution for the stated requirements?
 • Are sound object-oriented principles used in the Java code?
